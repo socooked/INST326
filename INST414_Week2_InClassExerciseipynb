@@ -1,0 +1,506 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/socooked/INST326/blob/main/INST414_Week2_InClassExerciseipynb\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 15,
+      "id": "6f42b81a",
+      "metadata": {
+        "id": "6f42b81a"
+      },
+      "outputs": [],
+      "source": [
+        "import json\n",
+        "import pandas as pd"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 16,
+      "id": "70c05cac",
+      "metadata": {
+        "id": "70c05cac"
+      },
+      "outputs": [],
+      "source": [
+        "actors_id_name_map = {}\n",
+        "actors_count = {}\n",
+        "genres_count = {}\n",
+        "film_ratings = []\n",
+        "film_votes = []\n",
+        "\n",
+        "# open the ratings data\n",
+        "with open(\"/content/sample_data/imdb_movies_2000to2022.prolific.json\", \"r\") as in_file:\n",
+        "\n",
+        "    # each line in the file is a JSON item\n",
+        "    for line in in_file:\n",
+        "\n",
+        "        # read this movie\n",
+        "        movie = json.loads(line)\n",
+        "\n",
+        "        # Iterate over each actor\n",
+        "        for actor_id,actor_name in movie[\"actors\"]:\n",
+        "            actors_id_name_map[actor_id] = actor_name\n",
+        "            actors_count[actor_id] = actors_count.get(actor_id, 0) + 1\n",
+        "\n",
+        "        # Iterate over each genre\n",
+        "        for genre in movie[\"genres\"]:\n",
+        "            genres_count[genre] = genres_count.get(genre, 0) + 1\n",
+        "\n",
+        "        if len(movie[\"rating\"]) > 0:\n",
+        "            # Add the movie rating to the list\n",
+        "            film_ratings.append((movie[\"title\"], movie[\"rating\"][\"avg\"]))\n",
+        "\n",
+        "            # Add the movie rating COUNT to the list\n",
+        "            film_votes.append((movie[\"title\"], movie[\"rating\"][\"votes\"]))\n",
+        ""
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 17,
+      "id": "6afeb161",
+      "metadata": {
+        "id": "6afeb161",
+        "outputId": "9cc83293-8d49-4200-86d6-e31ee2941124",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "nm0000616 Eric Roberts 194\n",
+            "nm0000514 Michael Madsen 98\n",
+            "nm0001744 Tom Sizemore 97\n",
+            "nm0001803 Danny Trejo 88\n",
+            "nm0222881 Tony Devon 75\n",
+            "nm2278431 Joe Hammerstone 71\n",
+            "nm0001002 Dean Cain 63\n",
+            "nm0290556 James Franco 63\n",
+            "nm0000246 Bruce Willis 61\n",
+            "nm0000115 Nicolas Cage 61\n"
+          ]
+        }
+      ],
+      "source": [
+        "top_actors = sorted(actors_count, key=actors_count.get, reverse=True)\n",
+        "for a_id in top_actors[:10]:\n",
+        "    print(a_id, actors_id_name_map[a_id], actors_count[a_id])"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 18,
+      "id": "c961f7d4-fdce-4f23-966a-c6456a2a22dd",
+      "metadata": {
+        "id": "c961f7d4-fdce-4f23-966a-c6456a2a22dd",
+        "outputId": "7a5425d7-f781-4f67-d5d9-31be33d895eb",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Drama 10157\n",
+            "Comedy 6017\n",
+            "Thriller 4004\n",
+            "Action 3743\n",
+            "Horror 3077\n",
+            "Crime 2773\n",
+            "Romance 2521\n",
+            "Adventure 1667\n",
+            "Mystery 1535\n",
+            "Sci-Fi 1055\n"
+          ]
+        }
+      ],
+      "source": [
+        "top_genres = sorted(genres_count, key=genres_count.get, reverse=True)\n",
+        "for g_id in top_genres[:10]:\n",
+        "    print(g_id, genres_count[g_id])"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 19,
+      "id": "d8301fab-947c-42d2-b0cc-28fdb8ee3754",
+      "metadata": {
+        "id": "d8301fab-947c-42d2-b0cc-28fdb8ee3754",
+        "outputId": "925813b7-0758-452d-db7f-14626f0762a3",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[('King James', 9.8),\n",
+              " ('Tutankhamun: Enter the Tomb', 9.7),\n",
+              " ('Cuando volveras', 9.7),\n",
+              " ('Detroit Under S.T.R.E.S.S.', 9.7),\n",
+              " ('Indocumentados', 9.6),\n",
+              " ('Controlled', 9.6),\n",
+              " ('All Hail the Popcorn King', 9.6),\n",
+              " ('Trust', 9.6),\n",
+              " ('As If They Were Angels', 9.6),\n",
+              " ('The Bed-Sitting Room', 9.6)]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 19
+        }
+      ],
+      "source": [
+        "sorted(film_ratings, key=lambda v: v[1], reverse=True)[:10]"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 20,
+      "id": "a399a902-eb5f-44c0-956f-fa69652246ae",
+      "metadata": {
+        "id": "a399a902-eb5f-44c0-956f-fa69652246ae",
+        "outputId": "a05d01a4-9789-4a5c-9e32-d52d961da51c",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[('The Dark Knight', 2667724),\n",
+              " ('Inception', 2366510),\n",
+              " ('The Lord of the Rings: The Fellowship of the Ring', 1885329),\n",
+              " ('The Lord of the Rings: The Return of the King', 1855813),\n",
+              " ('Interstellar', 1849404),\n",
+              " ('The Dark Knight Rises', 1714068),\n",
+              " ('The Lord of the Rings: The Two Towers', 1675772),\n",
+              " ('Django Unchained', 1565543),\n",
+              " ('Gladiator', 1509148),\n",
+              " ('Batman Begins', 1479441)]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 20
+        }
+      ],
+      "source": [
+        "sorted(film_votes, key=lambda v: v[1], reverse=True)[:10]"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "id": "75185887-a72b-4c8a-aa7d-08bcaedbb7bb",
+      "metadata": {
+        "id": "75185887-a72b-4c8a-aa7d-08bcaedbb7bb"
+      },
+      "source": [
+        "Genre Hits\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 21,
+      "id": "46197400-dd4a-4e07-89eb-47b318d94ee7",
+      "metadata": {
+        "id": "46197400-dd4a-4e07-89eb-47b318d94ee7"
+      },
+      "outputs": [],
+      "source": [
+        "genre_pair_rows = []\n",
+        "\n",
+        "# open the ratings data\n",
+        "with open(\"/content/sample_data/imdb_movies_2000to2022.prolific.json\", \"r\") as in_file:\n",
+        "\n",
+        "    # each line in the file is a JSON item\n",
+        "    for line in in_file:\n",
+        "\n",
+        "        # read this movie\n",
+        "        movie = json.loads(line)\n",
+        "\n",
+        "        if len(movie[\"rating\"]) == 0:\n",
+        "            continue\n",
+        "\n",
+        "        # Need at least double-genre movies\n",
+        "        if len(movie[\"genres\"]) < 2:\n",
+        "            continue\n",
+        "\n",
+        "        rating = movie[\"rating\"][\"avg\"]\n",
+        "\n",
+        "        sorted_genres = sorted(movie[\"genres\"])\n",
+        "        for i in range(len(sorted_genres)):\n",
+        "            for j in range(i+1,len(sorted_genres)):\n",
+        "                duo_genre = \"%s-%s\" % (sorted_genres[i], sorted_genres[j])\n",
+        "\n",
+        "                genre_pair_rows.append({\n",
+        "                    \"genre\": duo_genre,\n",
+        "                    \"rating\": rating\n",
+        "                })"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 22,
+      "id": "8bab88a4-ebc6-487d-bd9d-9ecc753109c1",
+      "metadata": {
+        "id": "8bab88a4-ebc6-487d-bd9d-9ecc753109c1"
+      },
+      "outputs": [],
+      "source": [
+        "double_genre_df = pd.DataFrame(genre_pair_rows)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 23,
+      "id": "6ccc3bc1-98f8-4093-80e6-6924602b6fe8",
+      "metadata": {
+        "id": "6ccc3bc1-98f8-4093-80e6-6924602b6fe8",
+        "outputId": "c95da2ea-babe-4b44-a446-66be1c2bf85d",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 394
+        }
+      },
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "                       rating\n",
+              "genre                        \n",
+              "Animation-Thriller   8.900000\n",
+              "Musical-Sport        8.100000\n",
+              "Music-Western        7.800000\n",
+              "Documentary-Romance  7.700000\n",
+              "History-Music        7.625000\n",
+              "Mystery-Sport        7.600000\n",
+              "Documentary-War      7.517647\n",
+              "Documentary-Sport    7.502222\n",
+              "Drama-News           7.500000\n",
+              "Action-Documentary   7.400000"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-9746d4ea-08b9-4289-801b-9970b9995f3a\" class=\"colab-df-container\">\n",
+              "    <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>rating</th>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>genre</th>\n",
+              "      <th></th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>Animation-Thriller</th>\n",
+              "      <td>8.900000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Musical-Sport</th>\n",
+              "      <td>8.100000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Music-Western</th>\n",
+              "      <td>7.800000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Documentary-Romance</th>\n",
+              "      <td>7.700000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>History-Music</th>\n",
+              "      <td>7.625000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Mystery-Sport</th>\n",
+              "      <td>7.600000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Documentary-War</th>\n",
+              "      <td>7.517647</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Documentary-Sport</th>\n",
+              "      <td>7.502222</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Drama-News</th>\n",
+              "      <td>7.500000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>Action-Documentary</th>\n",
+              "      <td>7.400000</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "    <div class=\"colab-df-buttons\">\n",
+              "\n",
+              "  <div class=\"colab-df-container\">\n",
+              "    <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-9746d4ea-08b9-4289-801b-9970b9995f3a')\"\n",
+              "            title=\"Convert this dataframe to an interactive table.\"\n",
+              "            style=\"display:none;\">\n",
+              "\n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\">\n",
+              "    <path d=\"M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z\"/>\n",
+              "  </svg>\n",
+              "    </button>\n",
+              "\n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-buttons div {\n",
+              "      margin-bottom: 4px;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "    <script>\n",
+              "      const buttonEl =\n",
+              "        document.querySelector('#df-9746d4ea-08b9-4289-801b-9970b9995f3a button.colab-df-convert');\n",
+              "      buttonEl.style.display =\n",
+              "        google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "      async function convertToInteractive(key) {\n",
+              "        const element = document.querySelector('#df-9746d4ea-08b9-4289-801b-9970b9995f3a');\n",
+              "        const dataTable =\n",
+              "          await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                    [key], {});\n",
+              "        if (!dataTable) return;\n",
+              "\n",
+              "        const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "          '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "          + ' to learn more about interactive tables.';\n",
+              "        element.innerHTML = '';\n",
+              "        dataTable['output_type'] = 'display_data';\n",
+              "        await google.colab.output.renderOutput(dataTable, element);\n",
+              "        const docLink = document.createElement('div');\n",
+              "        docLink.innerHTML = docLinkHtml;\n",
+              "        element.appendChild(docLink);\n",
+              "      }\n",
+              "    </script>\n",
+              "  </div>\n",
+              "\n",
+              "\n",
+              "    </div>\n",
+              "  </div>\n"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "dataframe",
+              "summary": "{\n  \"name\": \"double_genre_df\",\n  \"rows\": 10,\n  \"fields\": [\n    {\n      \"column\": \"genre\",\n      \"properties\": {\n        \"dtype\": \"string\",\n        \"num_unique_values\": 10,\n        \"samples\": [\n          \"Drama-News\",\n          \"Musical-Sport\",\n          \"Mystery-Sport\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"rating\",\n      \"properties\": {\n        \"dtype\": \"number\",\n        \"std\": 0.4455219168539273,\n        \"min\": 7.4,\n        \"max\": 8.9,\n        \"num_unique_values\": 10,\n        \"samples\": [\n          7.5,\n          8.1,\n          7.6\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    }\n  ]\n}"
+            }
+          },
+          "metadata": {},
+          "execution_count": 23
+        }
+      ],
+      "source": [
+        "double_genre_df.groupby(\"genre\").mean().sort_values(by=\"rating\", ascending=False).head(10)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 23,
+      "id": "12d09861-e422-4120-9d88-0de27bf2fcd7",
+      "metadata": {
+        "id": "12d09861-e422-4120-9d88-0de27bf2fcd7"
+      },
+      "outputs": [],
+      "source": []
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3 (ipykernel)",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.11.10"
+    },
+    "colab": {
+      "provenance": [],
+      "include_colab_link": true
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
